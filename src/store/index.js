@@ -10,17 +10,19 @@ const middlewares = [];
 const sagaMonitor = Reactotron ? Reactotron.createSagaMonitor() : null;
 
 const sagaMiddleware = createSagaMiddleware({ sagaMonitor });
-const tronMiddleware = Reactotron ? Reactotron.createEnhancer : () => {};
+const tronMiddleware = Reactotron ? Reactotron.createEnhancer : null;
 
 middlewares.push(sagaMiddleware);
 
-const store = createStore(
-  reducers,
-  compose(
-    tronMiddleware(),
-    applyMiddleware(...middlewares),
-  ),
-);
+const store = tronMiddleware
+  ? createStore(
+    reducers,
+    compose(
+      tronMiddleware(),
+      applyMiddleware(...middlewares),
+    ),
+  )
+  : createStore(reducers, compose(applyMiddleware(...middlewares)));
 
 sagaMiddleware.run(sagas);
 
